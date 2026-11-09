@@ -1,0 +1,24 @@
+(* <std::collections::btree_set::Intersection<'a, T, A> as std::iter::IteratorSpec> *)
+
+use seq.Seq
+
+type t_Intersection_T_A
+
+type t_T
+
+function view_Intersection_T_A (self: t_Intersection_T_A) : Seq.seq t_T
+
+predicate produces_Intersection_T_A (self: t_Intersection_T_A) (visited: Seq.seq t_T) (tl: t_Intersection_T_A) =
+  view_Intersection_T_A self = Seq.(++) visited (view_Intersection_T_A tl)
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+goal refines:
+  forall a: t_Intersection_T_A, ab: Seq.seq t_T, b: t_Intersection_T_A, bc: Seq.seq t_T, c: t_Intersection_T_A. produces_Intersection_T_A a ab b
+    -> produces_Intersection_T_A b bc c
+    -> produces_Intersection_T_A a ab b
+    /\ produces_Intersection_T_A b bc c
+    /\ (forall result: (). produces_Intersection_T_A a (Seq.(++) ab bc) c
+      -> produces_Intersection_T_A a (Seq.(++) ab bc) c)

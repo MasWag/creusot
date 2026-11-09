@@ -1,0 +1,22 @@
+(* <std::collections::btree_set::Range<'a, T> as std::iter::IteratorSpec> *)
+
+use seq.Seq
+
+type t_Range_T
+
+type t_T
+
+function view_Range_T (self: t_Range_T) : Seq.seq t_T
+
+predicate produces_Range_T (self: t_Range_T) (visited: Seq.seq t_T) (tl: t_Range_T) =
+  view_Range_T self = Seq.(++) visited (view_Range_T tl)
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+goal refines: forall a: t_Range_T, ab: Seq.seq t_T, b: t_Range_T, bc: Seq.seq t_T, c: t_Range_T. produces_Range_T a ab b
+    -> produces_Range_T b bc c
+    -> produces_Range_T a ab b
+    /\ produces_Range_T b bc c
+    /\ (forall result: (). produces_Range_T a (Seq.(++) ab bc) c -> produces_Range_T a (Seq.(++) ab bc) c)

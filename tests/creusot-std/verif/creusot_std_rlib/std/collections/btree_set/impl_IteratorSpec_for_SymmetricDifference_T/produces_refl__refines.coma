@@ -1,0 +1,20 @@
+(* <std::collections::btree_set::SymmetricDifference<'a, T> as std::iter::IteratorSpec> *)
+
+use seq.Seq
+
+type t_SymmetricDifference_T
+
+type t_T
+
+function view_SymmetricDifference_T (self: t_SymmetricDifference_T) : Seq.seq t_T
+
+predicate produces_SymmetricDifference_T (self: t_SymmetricDifference_T) (visited: Seq.seq t_T) (tl: t_SymmetricDifference_T) =
+  view_SymmetricDifference_T self = Seq.(++) visited (view_SymmetricDifference_T tl)
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+goal refines:
+  forall self: t_SymmetricDifference_T. forall result: (). produces_SymmetricDifference_T self (Seq.empty: Seq.seq t_T) self
+      -> produces_SymmetricDifference_T self (Seq.empty: Seq.seq t_T) self

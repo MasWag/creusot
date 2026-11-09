@@ -1,0 +1,1401 @@
+module M_basic
+  use set.Fset
+  use creusot.int.UInt64
+  use creusot.prelude.MutBorrow
+  use creusot.int.UInt32
+  use creusot.prelude.Any
+  use int.Int
+  
+  type t_BTreeSet_u32_Global
+  
+  predicate inv_BTreeSet_u32_Global (_1: t_BTreeSet_u32_Global)
+  
+  constant const_MAX: UInt64.t = (18446744073709551615: UInt64.t)
+  
+  function view_BTreeSet_u32_Global (self: t_BTreeSet_u32_Global) : Fset.fset int
+  
+  axiom view_BTreeSet_u32_Global_spec:
+    forall self: t_BTreeSet_u32_Global [view_BTreeSet_u32_Global self]. Fset.cardinal (view_BTreeSet_u32_Global self)
+      <= UInt64.t'int const_MAX
+  
+  let new_u32 (return (x: t_BTreeSet_u32_Global)) = any
+    [ return (result: t_BTreeSet_u32_Global) ->
+    {[@stop_split] [@expl:new_u32 ensures] ([@stop_split] [@expl:new result type invariant] inv_BTreeSet_u32_Global result)
+      /\ ([@stop_split] [@expl:new ensures] view_BTreeSet_u32_Global result = (Fset.empty: Fset.fset int))}
+      (! return {result}) ]
+  
+  predicate invariant_ref_BTreeSet_u32_Global [@inline:trivial] (self: t_BTreeSet_u32_Global) =
+    inv_BTreeSet_u32_Global self
+  
+  meta "rewrite_def" predicate invariant_ref_BTreeSet_u32_Global
+  
+  predicate inv_ref_BTreeSet_u32_Global [@inline:trivial] (_1: t_BTreeSet_u32_Global) =
+    invariant_ref_BTreeSet_u32_Global _1
+  
+  meta "rewrite_def" predicate inv_ref_BTreeSet_u32_Global
+  
+  let is_empty_u32 (self: t_BTreeSet_u32_Global) (return (x: bool)) =
+  {[@stop_split] [@expl:is_empty 'self' type invariant] inv_ref_BTreeSet_u32_Global self}
+    any
+    [ return (result: bool) -> {[@stop_split] [@expl:is_empty ensures] result
+      = (Fset.cardinal (view_BTreeSet_u32_Global self) = 0)}
+      (! return {result}) ]
+  
+  predicate invariant_refmut_BTreeSet_u32_Global [@inline:trivial] (self: MutBorrow.t t_BTreeSet_u32_Global) =
+    inv_BTreeSet_u32_Global self.current /\ inv_BTreeSet_u32_Global self.final
+  
+  meta "rewrite_def" predicate invariant_refmut_BTreeSet_u32_Global
+  
+  predicate inv_refmut_BTreeSet_u32_Global [@inline:trivial] (_1: MutBorrow.t t_BTreeSet_u32_Global) =
+    invariant_refmut_BTreeSet_u32_Global _1
+  
+  meta "rewrite_def" predicate inv_refmut_BTreeSet_u32_Global
+  
+  predicate contains_Int [@inline:trivial] (self: Fset.fset int) (e: int) = Fset.mem e self
+  
+  meta "rewrite_def" predicate contains_Int
+  
+  function deep_model_u32 [@inline:trivial] (self: UInt32.t) : int = UInt32.t'int self
+  
+  meta "rewrite_def" function deep_model_u32
+  
+  function add_Int [@inline:trivial] (self: Fset.fset int) (e: int) : Fset.fset int = Fset.add e self
+  
+  meta "rewrite_def" function add_Int
+  
+  let insert_u32 (self: MutBorrow.t t_BTreeSet_u32_Global) (value: UInt32.t) (return (x: bool)) =
+  {[@stop_split] [@expl:insert 'self' type invariant] inv_refmut_BTreeSet_u32_Global self}
+    any
+    [ return (result: bool) -> {[@stop_split] [@expl:insert_u32 ensures] ([@stop_split] [@expl:insert ensures #0] result
+        = (not contains_Int (view_BTreeSet_u32_Global self.current) (deep_model_u32 value)))
+      /\ ([@stop_split] [@expl:insert ensures #1] view_BTreeSet_u32_Global self.final
+      = add_Int (view_BTreeSet_u32_Global self.current) (deep_model_u32 value))}
+      (! return {result}) ]
+  
+  predicate resolve_BTreeSet_u32_Global (_1: t_BTreeSet_u32_Global)
+  
+  let len_u32 (self: t_BTreeSet_u32_Global) (return (x: UInt64.t)) =
+  {[@stop_split] [@expl:len 'self' type invariant] inv_ref_BTreeSet_u32_Global self}
+    any
+    [ return (result: UInt64.t) -> {[@stop_split] [@expl:len ensures] UInt64.t'int result
+      = Fset.cardinal (view_BTreeSet_u32_Global self)}
+      (! return {result}) ]
+  
+  function deep_model_ref_u32 [@inline:trivial] (self: UInt32.t) : int = deep_model_u32 self
+  
+  meta "rewrite_def" function deep_model_ref_u32
+  
+  let contains_u32 (self: t_BTreeSet_u32_Global) (value: UInt32.t) (return (x: bool)) =
+  {[@stop_split] [@expl:contains 'self' type invariant] inv_ref_BTreeSet_u32_Global self}
+    any
+    [ return (result: bool) -> {[@stop_split] [@expl:contains ensures] result
+      = contains_Int (view_BTreeSet_u32_Global self) (deep_model_ref_u32 value)}
+      (! return {result}) ]
+  
+  function remove_Int [@inline:trivial] (self: Fset.fset int) (e: int) : Fset.fset int = Fset.remove e self
+  
+  meta "rewrite_def" function remove_Int
+  
+  let remove_u32 (self: MutBorrow.t t_BTreeSet_u32_Global) (value: UInt32.t) (return (x: bool)) =
+  {[@stop_split] [@expl:remove 'self' type invariant] inv_refmut_BTreeSet_u32_Global self}
+    any
+    [ return (result: bool) -> {[@stop_split] [@expl:remove_u32 ensures] ([@stop_split] [@expl:remove ensures #0] result
+        = contains_Int (view_BTreeSet_u32_Global self.current) (deep_model_ref_u32 value))
+      /\ ([@stop_split] [@expl:remove ensures #1] view_BTreeSet_u32_Global self.final
+      = remove_Int (view_BTreeSet_u32_Global self.current) (deep_model_ref_u32 value))}
+      (! return {result}) ]
+  
+  type t_Option_ref_u32 = None | Some UInt32.t
+  
+  let get_u32 (self: t_BTreeSet_u32_Global) (value: UInt32.t) (return (x: t_Option_ref_u32)) =
+  {[@stop_split] [@expl:get 'self' type invariant] inv_ref_BTreeSet_u32_Global self}
+    any
+    [ return (result: t_Option_ref_u32) -> {[@stop_split] [@expl:get ensures] match result with
+        | Some r -> deep_model_ref_u32 r = deep_model_ref_u32 value
+        /\ contains_Int (view_BTreeSet_u32_Global self) (deep_model_ref_u32 value)
+        | None -> not contains_Int (view_BTreeSet_u32_Global self) (deep_model_ref_u32 value)
+        end}
+      (! return {result}) ]
+  
+  type t_Option_Int = None'0 | Some'0 int
+  
+  function deep_model_Option_ref_u32 [@inline:trivial] (self: t_Option_ref_u32) : t_Option_Int = match self with
+      | Some t -> Some'0 (deep_model_ref_u32 t)
+      | None -> None'0
+      end
+  
+  meta "rewrite_def" function deep_model_Option_ref_u32
+  
+  function deep_model_ref_Option_ref_u32 [@inline:trivial] (self: t_Option_ref_u32) : t_Option_Int =
+    deep_model_Option_ref_u32 self
+  
+  meta "rewrite_def" function deep_model_ref_Option_ref_u32
+  
+  let eq_Option_ref_u32 (self: t_Option_ref_u32) (other: t_Option_ref_u32) (return (x: bool)) = any
+    [ return (result: bool) -> {[@stop_split] [@expl:eq ensures] result
+      = (deep_model_ref_Option_ref_u32 self = deep_model_ref_Option_ref_u32 other)}
+      (! return {result}) ]
+  
+  let clear_u32 (self: MutBorrow.t t_BTreeSet_u32_Global) (return (x: ())) =
+  {[@stop_split] [@expl:clear 'self' type invariant] inv_refmut_BTreeSet_u32_Global self}
+    any
+    [ return (result: ()) -> {[@stop_split] [@expl:clear ensures] view_BTreeSet_u32_Global self.final
+      = (Fset.empty: Fset.fset int)}
+      (! return {result}) ]
+  
+  meta "compute_max_steps" 1000000
+  
+  meta "select_lsinst" "all"
+  
+  let basic (return (x: ())) = (! bb0
+    [ bb0 = s0
+      [ s0 = new_u32 (fun (_x: t_BTreeSet_u32_Global) -> [ &s <- _x ] s1)
+      | s1 = is_empty_u32 {s} (fun (_x: bool) -> [ &_3 <- _x ] s2)
+      | s2 = any [ br0 -> {_3 = false} (! bb4) | br1 -> {_3} (! bb3) ] ]
+    | bb3 = s0
+      [ s0 = MutBorrow.borrow_mut <t_BTreeSet_u32_Global> {s}
+          (fun (_bor: MutBorrow.t t_BTreeSet_u32_Global) ->
+            [ &_8 <- _bor ] -{inv_BTreeSet_u32_Global _bor.final}-
+            [ &s <- _bor.final ] s1) [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = insert_u32 {_8} {(2: UInt32.t)} (fun (_x: bool) -> [ &_7 <- _x ] s2)
+      | s2 = any [ br0 -> {_7 = false} (! bb7) | br1 -> {_7} (! bb6) ] ]
+    | bb6 = s0
+      [ s0 = MutBorrow.borrow_mut <t_BTreeSet_u32_Global> {s}
+          (fun (_bor: MutBorrow.t t_BTreeSet_u32_Global) ->
+            [ &_12 <- _bor ] -{inv_BTreeSet_u32_Global _bor.final}-
+            [ &s <- _bor.final ] s1) [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = insert_u32 {_12} {(1: UInt32.t)} (fun (_x: bool) -> [ &_11 <- _x ] s2)
+      | s2 = any [ br0 -> {_11 = false} (! bb10) | br1 -> {_11} (! bb9) ] ]
+    | bb9 = s0
+      [ s0 = MutBorrow.borrow_mut <t_BTreeSet_u32_Global> {s}
+          (fun (_bor: MutBorrow.t t_BTreeSet_u32_Global) ->
+            [ &_16 <- _bor ] -{inv_BTreeSet_u32_Global _bor.final}-
+            [ &s <- _bor.final ] s1) [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = insert_u32 {_16} {(2: UInt32.t)} (fun (_x: bool) -> [ &_15 <- _x ] s2)
+      | s2 = any [ br0 -> {_15 = false} (! bb13) | br1 -> {_15} (! bb12) ] ]
+    | bb12 = s0
+      [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = -{resolve_BTreeSet_u32_Global s}- s2
+      | s2 = {false} any ]
+    | bb13 = s0
+      [ s0 = len_u32 {s} (fun (_x: UInt64.t) -> [ &_20 <- _x ] s1)
+      | s1 = [ &_19 <- _20 = (2: UInt64.t) ] s2
+      | s2 = any [ br0 -> {_19 = false} (! bb16) | br1 -> {_19} (! bb15) ] ]
+    | bb15 = s0
+      [ s0 = bb0'0
+        [ bb0'0 = s0'0 [ s0'0 = [ &_ret'0 <- (1: UInt32.t) ] s1'0 | s1'0 = _const_ret {_ret'0} ] ]
+        [ & _ret'0: UInt32.t = Any.any_l () ] [ _const_ret (_const: UInt32.t) -> [ &_81 <- _const ] s1 ]
+      | s1 = [ &_27 <- _81 ] s2
+      | s2 = contains_u32 {s} {_27} (fun (_x: bool) -> [ &_24 <- _x ] s3)
+      | s3 = any [ br0 -> {_24 = false} (! bb19) | br1 -> {_24} (! bb18) ] ]
+    | bb18 = s0
+      [ s0 = bb0'0
+        [ bb0'0 = s0'0 [ s0'0 = [ &_ret'0 <- (3: UInt32.t) ] s1'0 | s1'0 = _const_ret {_ret'0} ] ]
+        [ & _ret'0: UInt32.t = Any.any_l () ] [ _const_ret (_const: UInt32.t) -> [ &_80 <- _const ] s1 ]
+      | s1 = [ &_34 <- _80 ] s2
+      | s2 = contains_u32 {s} {_34} (fun (_x: bool) -> [ &_31 <- _x ] s3)
+      | s3 = any [ br0 -> {_31 = false} (! bb22) | br1 -> {_31} (! bb21) ] ]
+    | bb21 = s0
+      [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = -{resolve_BTreeSet_u32_Global s}- s2
+      | s2 = {false} any ]
+    | bb22 = s0
+      [ s0 = bb0'0
+        [ bb0'0 = s0'0 [ s0'0 = [ &_ret'0 <- (1: UInt32.t) ] s1'0 | s1'0 = _const_ret {_ret'0} ] ]
+        [ & _ret'0: UInt32.t = Any.any_l () ] [ _const_ret (_const: UInt32.t) -> [ &_79 <- _const ] s1 ]
+      | s1 = [ &_41 <- _79 ] s2
+      | s2 = MutBorrow.borrow_mut <t_BTreeSet_u32_Global> {s}
+          (fun (_bor: MutBorrow.t t_BTreeSet_u32_Global) ->
+            [ &_39 <- _bor ] -{inv_BTreeSet_u32_Global _bor.final}-
+            [ &s <- _bor.final ] s3) [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s3 = remove_u32 {_39} {_41} (fun (_x: bool) -> [ &_38 <- _x ] s4)
+      | s4 = any [ br0 -> {_38 = false} (! bb25) | br1 -> {_38} (! bb24) ] ]
+    | bb24 = s0
+      [ s0 = bb0'0
+        [ bb0'0 = s0'0 [ s0'0 = [ &_ret'0 <- (1: UInt32.t) ] s1'0 | s1'0 = _const_ret {_ret'0} ] ]
+        [ & _ret'0: UInt32.t = Any.any_l () ] [ _const_ret (_const: UInt32.t) -> [ &_78 <- _const ] s1 ]
+      | s1 = [ &_48 <- _78 ] s2
+      | s2 = MutBorrow.borrow_mut <t_BTreeSet_u32_Global> {s}
+          (fun (_bor: MutBorrow.t t_BTreeSet_u32_Global) ->
+            [ &_46 <- _bor ] -{inv_BTreeSet_u32_Global _bor.final}-
+            [ &s <- _bor.final ] s3) [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s3 = remove_u32 {_46} {_48} (fun (_x: bool) -> [ &_45 <- _x ] s4)
+      | s4 = any [ br0 -> {_45 = false} (! bb28) | br1 -> {_45} (! bb27) ] ]
+    | bb27 = s0
+      [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = -{resolve_BTreeSet_u32_Global s}- s2
+      | s2 = {false} any ]
+    | bb28 = s0
+      [ s0 = len_u32 {s} (fun (_x: UInt64.t) -> [ &_53 <- _x ] s1)
+      | s1 = [ &_52 <- _53 = (1: UInt64.t) ] s2
+      | s2 = any [ br0 -> {_52 = false} (! bb31) | br1 -> {_52} (! bb30) ] ]
+    | bb30 = s0
+      [ s0 = bb0'0
+        [ bb0'0 = s0'0 [ s0'0 = [ &_ret'0 <- (2: UInt32.t) ] s1'0 | s1'0 = _const_ret {_ret'0} ] ]
+        [ & _ret'0: UInt32.t = Any.any_l () ] [ _const_ret (_const: UInt32.t) -> [ &_77 <- _const ] s1 ]
+      | s1 = [ &_62 <- _77 ] s2
+      | s2 = get_u32 {s} {_62} (fun (_x: t_Option_ref_u32) -> [ &_59 <- _x ] s3)
+      | s3 = bb0'0
+        [ bb0'0 = s0'0
+          [ s0'0 = [ &_3'0 <- (2: UInt32.t) ] s1'0
+          | s1'0 = [ &_1 <- Some _3'0 ] s2'0
+          | s2'0 = [ &_ret'0 <- _1 ] s3'0
+          | s3'0 = _const_ret {_ret'0} ] ]
+        [ & _ret'0: t_Option_ref_u32 = Any.any_l ()
+        | & _1: t_Option_ref_u32 = Any.any_l ()
+        | & _3'0: UInt32.t = Any.any_l () ] [ _const_ret (_const: t_Option_ref_u32) -> [ &_76 <- _const ] s4 ]
+      | s4 = eq_Option_ref_u32 {_59} {_76} (fun (_x: bool) -> [ &_57 <- _x ] s5)
+      | s5 = any [ br0 -> {_57 = false} (! bb35) | br1 -> {_57} (! bb34) ] ]
+    | bb34 = s0
+      [ s0 = MutBorrow.borrow_mut <t_BTreeSet_u32_Global> {s}
+          (fun (_bor: MutBorrow.t t_BTreeSet_u32_Global) ->
+            [ &_71 <- _bor ] -{inv_BTreeSet_u32_Global _bor.final}-
+            [ &s <- _bor.final ] s1) [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = clear_u32 {_71} (fun (_x: ()) -> [ &_70 <- _x ] s2)
+      | s2 = s3 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s3 = -{resolve_BTreeSet_u32_Global s}- s4
+      | s4 = is_empty_u32 {s} (fun (_x: bool) -> [ &_73 <- _x ] s5)
+      | s5 = any [ br0 -> {_73 = false} (! bb39) | br1 -> {_73} (! bb40) ] ]
+    | bb40 = return {_ret}
+    | bb39 = {false} any
+    | bb35 = s0
+      [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = -{resolve_BTreeSet_u32_Global s}- s2
+      | s2 = {false} any ]
+    | bb31 = s0
+      [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = -{resolve_BTreeSet_u32_Global s}- s2
+      | s2 = {false} any ]
+    | bb25 = s0
+      [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = -{resolve_BTreeSet_u32_Global s}- s2
+      | s2 = {false} any ]
+    | bb19 = s0
+      [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = -{resolve_BTreeSet_u32_Global s}- s2
+      | s2 = {false} any ]
+    | bb16 = s0
+      [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = -{resolve_BTreeSet_u32_Global s}- s2
+      | s2 = {false} any ]
+    | bb10 = s0
+      [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = -{resolve_BTreeSet_u32_Global s}- s2
+      | s2 = {false} any ]
+    | bb7 = s0
+      [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = -{resolve_BTreeSet_u32_Global s}- s2
+      | s2 = {false} any ]
+    | bb4 = s0
+      [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = -{resolve_BTreeSet_u32_Global s}- s2
+      | s2 = {false} any ] ]
+    [ & _ret: () = Any.any_l ()
+    | & s: t_BTreeSet_u32_Global = Any.any_l ()
+    | & _3: bool = Any.any_l ()
+    | & _7: bool = Any.any_l ()
+    | & _8: MutBorrow.t t_BTreeSet_u32_Global = Any.any_l ()
+    | & _11: bool = Any.any_l ()
+    | & _12: MutBorrow.t t_BTreeSet_u32_Global = Any.any_l ()
+    | & _15: bool = Any.any_l ()
+    | & _16: MutBorrow.t t_BTreeSet_u32_Global = Any.any_l ()
+    | & _19: bool = Any.any_l ()
+    | & _20: UInt64.t = Any.any_l ()
+    | & _24: bool = Any.any_l ()
+    | & _27: UInt32.t = Any.any_l ()
+    | & _31: bool = Any.any_l ()
+    | & _34: UInt32.t = Any.any_l ()
+    | & _38: bool = Any.any_l ()
+    | & _39: MutBorrow.t t_BTreeSet_u32_Global = Any.any_l ()
+    | & _41: UInt32.t = Any.any_l ()
+    | & _45: bool = Any.any_l ()
+    | & _46: MutBorrow.t t_BTreeSet_u32_Global = Any.any_l ()
+    | & _48: UInt32.t = Any.any_l ()
+    | & _52: bool = Any.any_l ()
+    | & _53: UInt64.t = Any.any_l ()
+    | & _57: bool = Any.any_l ()
+    | & _59: t_Option_ref_u32 = Any.any_l ()
+    | & _62: UInt32.t = Any.any_l ()
+    | & _70: () = Any.any_l ()
+    | & _71: MutBorrow.t t_BTreeSet_u32_Global = Any.any_l ()
+    | & _73: bool = Any.any_l ()
+    | & _76: t_Option_ref_u32 = Any.any_l ()
+    | & _77: UInt32.t = Any.any_l ()
+    | & _78: UInt32.t = Any.any_l ()
+    | & _79: UInt32.t = Any.any_l ()
+    | & _80: UInt32.t = Any.any_l ()
+    | & _81: UInt32.t = Any.any_l () ]) [ return (result: ()) -> (! return {result}) ]
+end
+module M_first_last
+  use set.Fset
+  use creusot.int.UInt64
+  use creusot.prelude.MutBorrow
+  use creusot.int.UInt32
+  use creusot.prelude.Any
+  use int.Int
+  
+  type t_BTreeSet_u32_Global
+  
+  predicate inv_BTreeSet_u32_Global (_1: t_BTreeSet_u32_Global)
+  
+  constant const_MAX: UInt64.t = (18446744073709551615: UInt64.t)
+  
+  function view_BTreeSet_u32_Global (self: t_BTreeSet_u32_Global) : Fset.fset int
+  
+  axiom view_BTreeSet_u32_Global_spec:
+    forall self: t_BTreeSet_u32_Global [view_BTreeSet_u32_Global self]. Fset.cardinal (view_BTreeSet_u32_Global self)
+      <= UInt64.t'int const_MAX
+  
+  let new_u32 (return (x: t_BTreeSet_u32_Global)) = any
+    [ return (result: t_BTreeSet_u32_Global) ->
+    {[@stop_split] [@expl:new_u32 ensures] ([@stop_split] [@expl:new result type invariant] inv_BTreeSet_u32_Global result)
+      /\ ([@stop_split] [@expl:new ensures] view_BTreeSet_u32_Global result = (Fset.empty: Fset.fset int))}
+      (! return {result}) ]
+  
+  predicate invariant_refmut_BTreeSet_u32_Global [@inline:trivial] (self: MutBorrow.t t_BTreeSet_u32_Global) =
+    inv_BTreeSet_u32_Global self.current /\ inv_BTreeSet_u32_Global self.final
+  
+  meta "rewrite_def" predicate invariant_refmut_BTreeSet_u32_Global
+  
+  predicate inv_refmut_BTreeSet_u32_Global [@inline:trivial] (_1: MutBorrow.t t_BTreeSet_u32_Global) =
+    invariant_refmut_BTreeSet_u32_Global _1
+  
+  meta "rewrite_def" predicate inv_refmut_BTreeSet_u32_Global
+  
+  predicate contains_Int [@inline:trivial] (self: Fset.fset int) (e: int) = Fset.mem e self
+  
+  meta "rewrite_def" predicate contains_Int
+  
+  function deep_model_u32 [@inline:trivial] (self: UInt32.t) : int = UInt32.t'int self
+  
+  meta "rewrite_def" function deep_model_u32
+  
+  function add_Int [@inline:trivial] (self: Fset.fset int) (e: int) : Fset.fset int = Fset.add e self
+  
+  meta "rewrite_def" function add_Int
+  
+  let insert_u32 (self: MutBorrow.t t_BTreeSet_u32_Global) (value: UInt32.t) (return (x: bool)) =
+  {[@stop_split] [@expl:insert 'self' type invariant] inv_refmut_BTreeSet_u32_Global self}
+    any
+    [ return (result: bool) -> {[@stop_split] [@expl:insert_u32 ensures] ([@stop_split] [@expl:insert ensures #0] result
+        = (not contains_Int (view_BTreeSet_u32_Global self.current) (deep_model_u32 value)))
+      /\ ([@stop_split] [@expl:insert ensures #1] view_BTreeSet_u32_Global self.final
+      = add_Int (view_BTreeSet_u32_Global self.current) (deep_model_u32 value))}
+      (! return {result}) ]
+  
+  type t_Option_ref_u32 = None | Some UInt32.t
+  
+  predicate invariant_ref_BTreeSet_u32_Global [@inline:trivial] (self: t_BTreeSet_u32_Global) =
+    inv_BTreeSet_u32_Global self
+  
+  meta "rewrite_def" predicate invariant_ref_BTreeSet_u32_Global
+  
+  predicate inv_ref_BTreeSet_u32_Global [@inline:trivial] (_1: t_BTreeSet_u32_Global) =
+    invariant_ref_BTreeSet_u32_Global _1
+  
+  meta "rewrite_def" predicate inv_ref_BTreeSet_u32_Global
+  
+  function deep_model_ref_u32 [@inline:trivial] (self: UInt32.t) : int = deep_model_u32 self
+  
+  meta "rewrite_def" function deep_model_ref_u32
+  
+  let first_u32 (self: t_BTreeSet_u32_Global) (return (x: t_Option_ref_u32)) =
+  {[@stop_split] [@expl:first 'self' type invariant] inv_ref_BTreeSet_u32_Global self}
+    any
+    [ return (result: t_Option_ref_u32) -> {[@stop_split] [@expl:first ensures] match result with
+        | Some x -> contains_Int (view_BTreeSet_u32_Global self) (deep_model_ref_u32 x)
+        /\ (forall y: int. contains_Int (view_BTreeSet_u32_Global self) y -> deep_model_ref_u32 x <= y)
+        | None -> Fset.cardinal (view_BTreeSet_u32_Global self) = 0
+        end}
+      (! return {result}) ]
+  
+  type t_Option_Int = None'0 | Some'0 int
+  
+  function deep_model_Option_ref_u32 [@inline:trivial] (self: t_Option_ref_u32) : t_Option_Int = match self with
+      | Some t -> Some'0 (deep_model_ref_u32 t)
+      | None -> None'0
+      end
+  
+  meta "rewrite_def" function deep_model_Option_ref_u32
+  
+  function deep_model_ref_Option_ref_u32 [@inline:trivial] (self: t_Option_ref_u32) : t_Option_Int =
+    deep_model_Option_ref_u32 self
+  
+  meta "rewrite_def" function deep_model_ref_Option_ref_u32
+  
+  let eq_Option_ref_u32 (self: t_Option_ref_u32) (other: t_Option_ref_u32) (return (x: bool)) = any
+    [ return (result: bool) -> {[@stop_split] [@expl:eq ensures] result
+      = (deep_model_ref_Option_ref_u32 self = deep_model_ref_Option_ref_u32 other)}
+      (! return {result}) ]
+  
+  let last_u32 (self: t_BTreeSet_u32_Global) (return (x: t_Option_ref_u32)) =
+  {[@stop_split] [@expl:last 'self' type invariant] inv_ref_BTreeSet_u32_Global self}
+    any
+    [ return (result: t_Option_ref_u32) -> {[@stop_split] [@expl:last ensures] match result with
+        | Some x -> contains_Int (view_BTreeSet_u32_Global self) (deep_model_ref_u32 x)
+        /\ (forall y: int. contains_Int (view_BTreeSet_u32_Global self) y -> y <= deep_model_ref_u32 x)
+        | None -> Fset.cardinal (view_BTreeSet_u32_Global self) = 0
+        end}
+      (! return {result}) ]
+  
+  type t_Option_u32 = None'1 | Some'1 UInt32.t
+  
+  function remove_Int [@inline:trivial] (self: Fset.fset int) (e: int) : Fset.fset int = Fset.remove e self
+  
+  meta "rewrite_def" function remove_Int
+  
+  let pop_first_u32 (self: MutBorrow.t t_BTreeSet_u32_Global) (return (x: t_Option_u32)) =
+  {[@stop_split] [@expl:pop_first 'self' type invariant] inv_refmut_BTreeSet_u32_Global self}
+    any
+    [ return (result: t_Option_u32) -> {[@stop_split] [@expl:pop_first ensures] match result with
+        | Some'1 x -> contains_Int (view_BTreeSet_u32_Global self.current) (deep_model_u32 x)
+        /\ (forall y: int. contains_Int (view_BTreeSet_u32_Global self.current) y -> deep_model_u32 x <= y)
+        /\ view_BTreeSet_u32_Global self.final = remove_Int (view_BTreeSet_u32_Global self.current) (deep_model_u32 x)
+        | None'1 -> Fset.cardinal (view_BTreeSet_u32_Global self.current) = 0 /\ self.final = self.current
+        end}
+      (! return {result}) ]
+  
+  function deep_model_Option_u32 [@inline:trivial] (self: t_Option_u32) : t_Option_Int = match self with
+      | Some'1 t -> Some'0 (deep_model_u32 t)
+      | None'1 -> None'0
+      end
+  
+  meta "rewrite_def" function deep_model_Option_u32
+  
+  function deep_model_ref_Option_u32 [@inline:trivial] (self: t_Option_u32) : t_Option_Int = deep_model_Option_u32 self
+  
+  meta "rewrite_def" function deep_model_ref_Option_u32
+  
+  let eq_Option_u32 (self: t_Option_u32) (other: t_Option_u32) (return (x: bool)) = any
+    [ return (result: bool) -> {[@stop_split] [@expl:eq ensures] result
+      = (deep_model_ref_Option_u32 self = deep_model_ref_Option_u32 other)}
+      (! return {result}) ]
+  
+  let pop_last_u32 (self: MutBorrow.t t_BTreeSet_u32_Global) (return (x: t_Option_u32)) =
+  {[@stop_split] [@expl:pop_last 'self' type invariant] inv_refmut_BTreeSet_u32_Global self}
+    any
+    [ return (result: t_Option_u32) -> {[@stop_split] [@expl:pop_last ensures] match result with
+        | Some'1 x -> contains_Int (view_BTreeSet_u32_Global self.current) (deep_model_u32 x)
+        /\ (forall y: int. contains_Int (view_BTreeSet_u32_Global self.current) y -> y <= deep_model_u32 x)
+        /\ view_BTreeSet_u32_Global self.final = remove_Int (view_BTreeSet_u32_Global self.current) (deep_model_u32 x)
+        | None'1 -> Fset.cardinal (view_BTreeSet_u32_Global self.current) = 0 /\ self.final = self.current
+        end}
+      (! return {result}) ]
+  
+  predicate resolve_BTreeSet_u32_Global (_1: t_BTreeSet_u32_Global)
+  
+  meta "compute_max_steps" 1000000
+  
+  meta "select_lsinst" "all"
+  
+  let first_last (return (x: ())) = (! bb0
+    [ bb0 = s0
+      [ s0 = new_u32 (fun (_x: t_BTreeSet_u32_Global) -> [ &s <- _x ] s1)
+      | s1 = MutBorrow.borrow_mut <t_BTreeSet_u32_Global> {s}
+          (fun (_bor: MutBorrow.t t_BTreeSet_u32_Global) ->
+            [ &_3 <- _bor ] -{inv_BTreeSet_u32_Global _bor.final}-
+            [ &s <- _bor.final ] s2) [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s2 = insert_u32 {_3} {(5: UInt32.t)} (fun (_x: bool) -> [ &_2 <- _x ] s3)
+      | s3 = MutBorrow.borrow_mut <t_BTreeSet_u32_Global> {s}
+          (fun (_bor: MutBorrow.t t_BTreeSet_u32_Global) ->
+            [ &_5 <- _bor ] -{inv_BTreeSet_u32_Global _bor.final}-
+            [ &s <- _bor.final ] s4) [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s4 = insert_u32 {_5} {(1: UInt32.t)} (fun (_x: bool) -> [ &_4 <- _x ] s5)
+      | s5 = MutBorrow.borrow_mut <t_BTreeSet_u32_Global> {s}
+          (fun (_bor: MutBorrow.t t_BTreeSet_u32_Global) ->
+            [ &_7 <- _bor ] -{inv_BTreeSet_u32_Global _bor.final}-
+            [ &s <- _bor.final ] s6) [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s6 = insert_u32 {_7} {(3: UInt32.t)} (fun (_x: bool) -> [ &_6 <- _x ] s7)
+      | s7 = {[@expl:assertion] forall x: int. contains_Int (view_BTreeSet_u32_Global s) x -> x = 1 \/ x = 3 \/ x = 5}
+        s8
+      | s8 = first_u32 {s} (fun (_x: t_Option_ref_u32) -> [ &_14 <- _x ] s9)
+      | s9 = bb0'0
+        [ bb0'0 = s0'0
+          [ s0'0 = [ &_3'0 <- (1: UInt32.t) ] s1'0
+          | s1'0 = [ &_1 <- Some _3'0 ] s2'0
+          | s2'0 = [ &_ret'0 <- _1 ] s3'0
+          | s3'0 = _const_ret {_ret'0} ] ]
+        [ & _ret'0: t_Option_ref_u32 = Any.any_l ()
+        | & _1: t_Option_ref_u32 = Any.any_l ()
+        | & _3'0: UInt32.t = Any.any_l () ] [ _const_ret (_const: t_Option_ref_u32) -> [ &_61 <- _const ] s10 ]
+      | s10 = eq_Option_ref_u32 {_14} {_61} (fun (_x: bool) -> [ &_12 <- _x ] s11)
+      | s11 = any [ br0 -> {_12 = false} (! bb8) | br1 -> {_12} (! bb7) ] ]
+    | bb7 = s0
+      [ s0 = last_u32 {s} (fun (_x: t_Option_ref_u32) -> [ &_25 <- _x ] s1)
+      | s1 = bb0'0
+        [ bb0'0 = s0'0
+          [ s0'0 = [ &_3'0 <- (5: UInt32.t) ] s1'0
+          | s1'0 = [ &_1 <- Some _3'0 ] s2'0
+          | s2'0 = [ &_ret'0 <- _1 ] s3'0
+          | s3'0 = _const_ret {_ret'0} ] ]
+        [ & _ret'0: t_Option_ref_u32 = Any.any_l ()
+        | & _1: t_Option_ref_u32 = Any.any_l ()
+        | & _3'0: UInt32.t = Any.any_l () ] [ _const_ret (_const: t_Option_ref_u32) -> [ &_60 <- _const ] s2 ]
+      | s2 = eq_Option_ref_u32 {_25} {_60} (fun (_x: bool) -> [ &_23 <- _x ] s3)
+      | s3 = any [ br0 -> {_23 = false} (! bb12) | br1 -> {_23} (! bb11) ] ]
+    | bb11 = s0
+      [ s0 = MutBorrow.borrow_mut <t_BTreeSet_u32_Global> {s}
+          (fun (_bor: MutBorrow.t t_BTreeSet_u32_Global) ->
+            [ &_37 <- _bor ] -{inv_BTreeSet_u32_Global _bor.final}-
+            [ &s <- _bor.final ] s1) [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = pop_first_u32 {_37} (fun (_x: t_Option_u32) -> [ &_36 <- _x ] s2)
+      | s2 = bb0'0
+        [ bb0'0 = s0'0
+          [ s0'0 = [ &_1 <- Some'1 (1: UInt32.t) ] s1'0 | s1'0 = [ &_ret'0 <- _1 ] s2'0 | s2'0 = _const_ret {_ret'0} ] ]
+        [ & _ret'0: t_Option_u32 = Any.any_l () | & _1: t_Option_u32 = Any.any_l () ]
+        [ _const_ret (_const: t_Option_u32) -> [ &_59 <- _const ] s3 ]
+      | s3 = eq_Option_u32 {_36} {_59} (fun (_x: bool) -> [ &_34 <- _x ] s4)
+      | s4 = any [ br0 -> {_34 = false} (! bb16) | br1 -> {_34} (! bb15) ] ]
+    | bb15 = s0
+      [ s0 = MutBorrow.borrow_mut <t_BTreeSet_u32_Global> {s}
+          (fun (_bor: MutBorrow.t t_BTreeSet_u32_Global) ->
+            [ &_45 <- _bor ] -{inv_BTreeSet_u32_Global _bor.final}-
+            [ &s <- _bor.final ] s1) [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = pop_last_u32 {_45} (fun (_x: t_Option_u32) -> [ &_44 <- _x ] s2)
+      | s2 = bb0'0
+        [ bb0'0 = s0'0
+          [ s0'0 = [ &_1 <- Some'1 (5: UInt32.t) ] s1'0 | s1'0 = [ &_ret'0 <- _1 ] s2'0 | s2'0 = _const_ret {_ret'0} ] ]
+        [ & _ret'0: t_Option_u32 = Any.any_l () | & _1: t_Option_u32 = Any.any_l () ]
+        [ _const_ret (_const: t_Option_u32) -> [ &_58 <- _const ] s3 ]
+      | s3 = eq_Option_u32 {_44} {_58} (fun (_x: bool) -> [ &_42 <- _x ] s4)
+      | s4 = any [ br0 -> {_42 = false} (! bb20) | br1 -> {_42} (! bb19) ] ]
+    | bb19 = s0
+      [ s0 = MutBorrow.borrow_mut <t_BTreeSet_u32_Global> {s}
+          (fun (_bor: MutBorrow.t t_BTreeSet_u32_Global) ->
+            [ &_53 <- _bor ] -{inv_BTreeSet_u32_Global _bor.final}-
+            [ &s <- _bor.final ] s1) [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = pop_first_u32 {_53} (fun (_x: t_Option_u32) -> [ &_52 <- _x ] s2)
+      | s2 = s3 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s3 = -{resolve_BTreeSet_u32_Global s}- s4
+      | s4 = bb0'0
+        [ bb0'0 = s0'0
+          [ s0'0 = [ &_1 <- Some'1 (3: UInt32.t) ] s1'0 | s1'0 = [ &_ret'0 <- _1 ] s2'0 | s2'0 = _const_ret {_ret'0} ] ]
+        [ & _ret'0: t_Option_u32 = Any.any_l () | & _1: t_Option_u32 = Any.any_l () ]
+        [ _const_ret (_const: t_Option_u32) -> [ &_57 <- _const ] s5 ]
+      | s5 = eq_Option_u32 {_52} {_57} (fun (_x: bool) -> [ &_50 <- _x ] s6)
+      | s6 = any [ br0 -> {_50 = false} (! bb24) | br1 -> {_50} (! bb25) ] ]
+    | bb25 = return {_ret}
+    | bb24 = {false} any
+    | bb20 = s0
+      [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = -{resolve_BTreeSet_u32_Global s}- s2
+      | s2 = {false} any ]
+    | bb16 = s0
+      [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = -{resolve_BTreeSet_u32_Global s}- s2
+      | s2 = {false} any ]
+    | bb12 = s0
+      [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = -{resolve_BTreeSet_u32_Global s}- s2
+      | s2 = {false} any ]
+    | bb8 = s0
+      [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global s} any) ]
+      | s1 = -{resolve_BTreeSet_u32_Global s}- s2
+      | s2 = {false} any ] ]
+    [ & _ret: () = Any.any_l ()
+    | & s: t_BTreeSet_u32_Global = Any.any_l ()
+    | & _2: bool = Any.any_l ()
+    | & _3: MutBorrow.t t_BTreeSet_u32_Global = Any.any_l ()
+    | & _4: bool = Any.any_l ()
+    | & _5: MutBorrow.t t_BTreeSet_u32_Global = Any.any_l ()
+    | & _6: bool = Any.any_l ()
+    | & _7: MutBorrow.t t_BTreeSet_u32_Global = Any.any_l ()
+    | & _12: bool = Any.any_l ()
+    | & _14: t_Option_ref_u32 = Any.any_l ()
+    | & _23: bool = Any.any_l ()
+    | & _25: t_Option_ref_u32 = Any.any_l ()
+    | & _34: bool = Any.any_l ()
+    | & _36: t_Option_u32 = Any.any_l ()
+    | & _37: MutBorrow.t t_BTreeSet_u32_Global = Any.any_l ()
+    | & _42: bool = Any.any_l ()
+    | & _44: t_Option_u32 = Any.any_l ()
+    | & _45: MutBorrow.t t_BTreeSet_u32_Global = Any.any_l ()
+    | & _50: bool = Any.any_l ()
+    | & _52: t_Option_u32 = Any.any_l ()
+    | & _53: MutBorrow.t t_BTreeSet_u32_Global = Any.any_l ()
+    | & _57: t_Option_u32 = Any.any_l ()
+    | & _58: t_Option_u32 = Any.any_l ()
+    | & _59: t_Option_u32 = Any.any_l ()
+    | & _60: t_Option_ref_u32 = Any.any_l ()
+    | & _61: t_Option_ref_u32 = Any.any_l () ]) [ return (result: ()) -> (! return {result}) ]
+end
+module M_intersection_vec
+  use seq.Seq
+  use creusot.int.UInt64
+  use set.Fset
+  use creusot.prelude.MutBorrow
+  use creusot.prelude.Any
+  use int.Int
+  
+  type t_Vec_u64_Global
+  
+  constant const_MAX: UInt64.t = (18446744073709551615: UInt64.t)
+  
+  function view_Vec_u64_Global (self: t_Vec_u64_Global) : Seq.seq UInt64.t
+  
+  axiom view_Vec_u64_Global_spec:
+    forall self: t_Vec_u64_Global [view_Vec_u64_Global self]. Seq.length (view_Vec_u64_Global self)
+      <= UInt64.t'int const_MAX
+  
+  let new_u64 (return (x: t_Vec_u64_Global)) = any
+    [ return (result: t_Vec_u64_Global) -> {[@stop_split] [@expl:new ensures] Seq.length (view_Vec_u64_Global result)
+      = 0}
+      (! return {result}) ]
+  
+  type t_BTreeSet_u64_Global
+  
+  type t_Intersection_u64_Global
+  
+  predicate inv_BTreeSet_u64_Global (_1: t_BTreeSet_u64_Global)
+  
+  predicate invariant_ref_BTreeSet_u64_Global [@inline:trivial] (self: t_BTreeSet_u64_Global) =
+    inv_BTreeSet_u64_Global self
+  
+  meta "rewrite_def" predicate invariant_ref_BTreeSet_u64_Global
+  
+  predicate inv_ref_BTreeSet_u64_Global [@inline:trivial] (_1: t_BTreeSet_u64_Global) =
+    invariant_ref_BTreeSet_u64_Global _1
+  
+  meta "rewrite_def" predicate inv_ref_BTreeSet_u64_Global
+  
+  predicate inv_Intersection_u64_Global (_1: t_Intersection_u64_Global)
+  
+  function deep_model_u64 [@inline:trivial] (self: UInt64.t) : int = UInt64.t'int self
+  
+  meta "rewrite_def" function deep_model_u64
+  
+  function deep_model_ref_u64 [@inline:trivial] (self: UInt64.t) : int = deep_model_u64 self
+  
+  meta "rewrite_def" function deep_model_ref_u64
+  
+  predicate contains_Int [@inline:trivial] (self: Fset.fset int) (e: int) = Fset.mem e self
+  
+  meta "rewrite_def" predicate contains_Int
+  
+  predicate sorted_elems_ref_u64 (s: Fset.fset int) (seq: Seq.seq UInt64.t) =
+    Seq.length seq = Fset.cardinal s
+    /\ (forall i: int, j: int. 0 <= i /\ i < j /\ j < Seq.length seq
+        -> deep_model_ref_u64 (Seq.get seq i) < deep_model_ref_u64 (Seq.get seq j))
+    /\ (forall i: int. 0 <= i /\ i < Seq.length seq -> contains_Int s (deep_model_ref_u64 (Seq.get seq i)))
+    /\ (forall x: int. contains_Int s x
+      -> (exists i: int. 0 <= i /\ i < Seq.length seq /\ deep_model_ref_u64 (Seq.get seq i) = x))
+  
+  function view_BTreeSet_u64_Global (self: t_BTreeSet_u64_Global) : Fset.fset int
+  
+  axiom view_BTreeSet_u64_Global_spec:
+    forall self: t_BTreeSet_u64_Global [view_BTreeSet_u64_Global self]. Fset.cardinal (view_BTreeSet_u64_Global self)
+      <= UInt64.t'int const_MAX
+  
+  function view_Intersection_u64_Global (self: t_Intersection_u64_Global) : Seq.seq UInt64.t
+  
+  let intersection_u64 (self: t_BTreeSet_u64_Global) (other: t_BTreeSet_u64_Global)
+    (return (x: t_Intersection_u64_Global)) =
+  {[@stop_split] [@expl:intersection_u64 requires] ([@stop_split] [@expl:intersection 'self' type invariant] inv_ref_BTreeSet_u64_Global self)
+    /\ ([@stop_split] [@expl:intersection 'other' type invariant] inv_ref_BTreeSet_u64_Global other)}
+    any
+    [ return (result: t_Intersection_u64_Global) ->
+    {[@stop_split] [@expl:intersection_u64 ensures] ([@stop_split] [@expl:intersection result type invariant] inv_Intersection_u64_Global result)
+      /\ ([@stop_split] [@expl:intersection ensures] sorted_elems_ref_u64 (Fset.inter (view_BTreeSet_u64_Global self) (view_BTreeSet_u64_Global other)) (view_Intersection_u64_Global result))}
+      (! return {result}) ]
+  
+  let into_iter_Intersection_u64_Global (self: t_Intersection_u64_Global) (return (x: t_Intersection_u64_Global)) =
+  {[@stop_split] [@expl:into_iter 'self' type invariant] inv_Intersection_u64_Global self}
+    any
+    [ return (result: t_Intersection_u64_Global) ->
+    {[@stop_split] [@expl:into_iter_Intersection_u64_Global ensures] ([@stop_split] [@expl:into_iter result type invariant] inv_Intersection_u64_Global result)
+      /\ ([@stop_split] [@expl:into_iter ensures] result = self)}
+      (! return {result}) ]
+  
+  type t_Option_ref_u64 = None | Some UInt64.t
+  
+  predicate invariant_refmut_Intersection_u64_Global [@inline:trivial] (self: MutBorrow.t t_Intersection_u64_Global) =
+    inv_Intersection_u64_Global self.current /\ inv_Intersection_u64_Global self.final
+  
+  meta "rewrite_def" predicate invariant_refmut_Intersection_u64_Global
+  
+  predicate inv_refmut_Intersection_u64_Global [@inline:trivial] (_1: MutBorrow.t t_Intersection_u64_Global) =
+    invariant_refmut_Intersection_u64_Global _1
+  
+  meta "rewrite_def" predicate inv_refmut_Intersection_u64_Global
+  
+  predicate produces_Intersection_u64_Global (self: t_Intersection_u64_Global) (visited: Seq.seq UInt64.t) (tl: t_Intersection_u64_Global) =
+    view_Intersection_u64_Global self = Seq.(++) visited (view_Intersection_u64_Global tl)
+  
+  function produces_trans_Intersection_u64_Global (a: t_Intersection_u64_Global) (ab: Seq.seq UInt64.t) (b: t_Intersection_u64_Global) (bc: Seq.seq UInt64.t) (c: t_Intersection_u64_Global) : ()
+  
+  axiom produces_trans_Intersection_u64_Global_spec:
+    forall a: t_Intersection_u64_Global, ab: Seq.seq UInt64.t, b: t_Intersection_u64_Global, bc: Seq.seq UInt64.t, c: t_Intersection_u64_Global. produces_Intersection_u64_Global a ab b
+      -> produces_Intersection_u64_Global b bc c -> produces_Intersection_u64_Global a (Seq.(++) ab bc) c
+  
+  function produces_refl_Intersection_u64_Global (self: t_Intersection_u64_Global) : ()
+  
+  axiom produces_refl_Intersection_u64_Global_spec:
+    forall self: t_Intersection_u64_Global. produces_Intersection_u64_Global self (Seq.empty: Seq.seq UInt64.t) self
+  
+  predicate resolve_refmut_Intersection_u64_Global [@inline:trivial] (_1: MutBorrow.t t_Intersection_u64_Global) =
+    _1.final = _1.current
+  
+  meta "rewrite_def" predicate resolve_refmut_Intersection_u64_Global
+  
+  predicate completed_Intersection_u64_Global (self: MutBorrow.t t_Intersection_u64_Global) =
+    resolve_refmut_Intersection_u64_Global self
+    /\ view_Intersection_u64_Global self.current = (Seq.empty: Seq.seq UInt64.t)
+  
+  let next_Intersection_u64_Global (self: MutBorrow.t t_Intersection_u64_Global) (return (x: t_Option_ref_u64)) =
+  {[@stop_split] [@expl:next 'self' type invariant] inv_refmut_Intersection_u64_Global self}
+    any
+    [ return (result: t_Option_ref_u64) -> {[@stop_split] [@expl:next ensures] match result with
+        | None -> completed_Intersection_u64_Global self
+        | Some v -> produces_Intersection_u64_Global self.current (Seq.singleton v) self.final
+        end}
+      (! return {result}) ]
+  
+  function index_Vec_u64_Global [@inline:trivial] (self: t_Vec_u64_Global) (ix: int) : UInt64.t =
+    Seq.get (view_Vec_u64_Global self) ix
+  
+  meta "rewrite_def" function index_Vec_u64_Global
+  
+  predicate inv_Seq_ref_u64 [@inline:trivial] (_1: Seq.seq UInt64.t) = true
+  
+  meta "rewrite_def" predicate inv_Seq_ref_u64
+  
+  let elim_Some (_x: t_Option_ref_u64) (return (f0: UInt64.t)) = any
+    [ _k (f0: UInt64.t) -> {Some f0 = _x} (! return {f0})
+    | _chk -> (! {[@expl:elim Some] match _x with
+        | Some _ -> true
+        | _ -> false
+        end}
+      any) ]
+  
+  let push_u64 (self: MutBorrow.t t_Vec_u64_Global) (value: UInt64.t) (return (x: ())) = any
+    [ return (result: ()) -> {[@stop_split] [@expl:push ensures] view_Vec_u64_Global self.final
+      = Seq.snoc (view_Vec_u64_Global self.current) value}
+      (! return {result}) ]
+  
+  predicate resolve_Intersection_u64_Global (_1: t_Intersection_u64_Global)
+  
+  meta "compute_max_steps" 1000000
+  
+  meta "select_lsinst" "all"
+  
+  let intersection_vec (a: t_BTreeSet_u64_Global) (b: t_BTreeSet_u64_Global) (return (x: t_Vec_u64_Global)) =
+  {[@stop_split] [@expl:intersection_vec requires] ([@stop_split] [@expl:intersection_vec 'a' type invariant] inv_ref_BTreeSet_u64_Global a)
+    /\ ([@stop_split] [@expl:intersection_vec 'b' type invariant] inv_ref_BTreeSet_u64_Global b)}
+    (! bb0
+    [ bb0 = s0
+      [ s0 = new_u64 (fun (_x: t_Vec_u64_Global) -> [ &res <- _x ] s1)
+      | s1 = intersection_u64 {a} {b} (fun (_x: t_Intersection_u64_Global) -> [ &it <- _x ] s2)
+      | s2 = [ &it0 <- it ] s3
+      | s3 = into_iter_Intersection_u64_Global {it} (fun (_x: t_Intersection_u64_Global) -> [ &iter <- _x ] s4)
+      | s4 = [ &iter_old <- iter ] s5
+      | s5 = [ &_21 <- Seq.empty: Seq.seq UInt64.t ] s6
+      | s6 = [ &produced <- _21 ] s7
+      | s7 = bb7 ]
+    | bb7 = bb7
+      [ bb7 = {[@expl:inferred invariant: type invariant] inv_Intersection_u64_Global iter}
+        {[@expl:for invariant] inv_Seq_ref_u64 produced}
+        {[@expl:for invariant] produces_Intersection_u64_Global iter_old produced iter}
+        {[@expl:loop invariant #0] forall i: int. 0 <= i /\ i < Seq.length produced
+          -> Seq.get produced i = Seq.get (view_Intersection_u64_Global it0) i}
+        {[@expl:loop invariant #1] Seq.length (view_Vec_u64_Global res) = Seq.length produced}
+        {[@expl:loop invariant #2] forall i: int. 0 <= i /\ i < Seq.length produced
+          -> index_Vec_u64_Global res i = Seq.get produced i}
+        (! s0)
+        [ s0 = MutBorrow.borrow_mut <t_Intersection_u64_Global> {iter}
+            (fun (_bor: MutBorrow.t t_Intersection_u64_Global) ->
+              [ &_42 <- _bor ] -{inv_Intersection_u64_Global _bor.final}-
+              [ &iter <- _bor.final ] s1) [ _ck -> (! {[@expl:type invariant] inv_Intersection_u64_Global iter} any) ]
+        | s1 = MutBorrow.borrow_final <t_Intersection_u64_Global> {_42.current} {MutBorrow.get_id _42}
+            (fun (_bor: MutBorrow.t t_Intersection_u64_Global) ->
+              [ &_41 <- _bor ] -{inv_Intersection_u64_Global _bor.final}-
+              [ &_42 <- { _42 with current = _bor.final } ] s2)
+          [ _ck -> (! {[@expl:type invariant] inv_Intersection_u64_Global _42.current} any) ]
+        | s2 = next_Intersection_u64_Global {_41} (fun (_x: t_Option_ref_u64) -> [ &_40 <- _x ] s3)
+        | s3 = s4 [ _ck -> (! {[@expl:type invariant] inv_refmut_Intersection_u64_Global _42} any) ]
+        | s4 = -{resolve_refmut_Intersection_u64_Global _42}- s5
+        | s5 = any [ br0 -> {_40 = None} (! bb12) | br1 (x0: UInt64.t) -> {_40 = Some x0} (! bb13) ] ]
+        [ bb13 = s0
+          [ s0 = elim_Some {_40} (fun (r0: UInt64.t) -> [ &__creusot_proc_iter_elem <- r0 ] s1)
+          | s1 = [ &_46 <- Seq.(++) produced (Seq.singleton __creusot_proc_iter_elem) ] s2
+          | s2 = [ &produced <- _46 ] s3
+          | s3 = [ &x <- __creusot_proc_iter_elem ] s4
+          | s4 = MutBorrow.borrow_mut <t_Vec_u64_Global> {res}
+              (fun (_bor: MutBorrow.t t_Vec_u64_Global) -> [ &_52 <- _bor ] [ &res <- _bor.final ] s5)
+          | s5 = push_u64 {_52} {x} (fun (_x: ()) -> [ &_51 <- _x ] s6)
+          | s6 = bb7 ] ] ]
+    | bb12 = s0
+      [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_Intersection_u64_Global iter} any) ]
+      | s1 = -{resolve_Intersection_u64_Global iter}- s2
+      | s2 = [ &_ret <- res ] s3
+      | s3 = return {_ret} ] ]
+    [ & _ret: t_Vec_u64_Global = Any.any_l ()
+    | & a: t_BTreeSet_u64_Global = a
+    | & b: t_BTreeSet_u64_Global = b
+    | & res: t_Vec_u64_Global = Any.any_l ()
+    | & it: t_Intersection_u64_Global = Any.any_l ()
+    | & it0: t_Intersection_u64_Global = Any.any_l ()
+    | & iter: t_Intersection_u64_Global = Any.any_l ()
+    | & iter_old: t_Intersection_u64_Global = Any.any_l ()
+    | & produced: Seq.seq UInt64.t = Any.any_l ()
+    | & _21: Seq.seq UInt64.t = Any.any_l ()
+    | & _40: t_Option_ref_u64 = Any.any_l ()
+    | & _41: MutBorrow.t t_Intersection_u64_Global = Any.any_l ()
+    | & _42: MutBorrow.t t_Intersection_u64_Global = Any.any_l ()
+    | & __creusot_proc_iter_elem: UInt64.t = Any.any_l ()
+    | & _46: Seq.seq UInt64.t = Any.any_l ()
+    | & x: UInt64.t = Any.any_l ()
+    | & _51: () = Any.any_l ()
+    | & _52: MutBorrow.t t_Vec_u64_Global = Any.any_l () ])
+    [ return (result: t_Vec_u64_Global) -> {[@stop_split] [@expl:intersection_vec ensures] forall i: int. 0 <= i
+          /\ i < Seq.length (view_Vec_u64_Global result)
+        -> contains_Int (view_BTreeSet_u64_Global a) (UInt64.t'int (index_Vec_u64_Global result i))
+        /\ contains_Int (view_BTreeSet_u64_Global b) (UInt64.t'int (index_Vec_u64_Global result i))}
+      (! return {result}) ]
+end
+module M_roundtrip_into_iter
+  use set.Fset
+  use creusot.int.UInt64
+  use seq.Seq
+  use creusot.prelude.MutBorrow
+  use creusot.prelude.Any
+  use int.Int
+  
+  type t_BTreeSet_u64_Global
+  
+  type t_IntoIter_u64_Global
+  
+  predicate inv_BTreeSet_u64_Global (_1: t_BTreeSet_u64_Global)
+  
+  predicate inv_IntoIter_u64_Global (_1: t_IntoIter_u64_Global)
+  
+  function deep_model_u64 [@inline:trivial] (self: UInt64.t) : int = UInt64.t'int self
+  
+  meta "rewrite_def" function deep_model_u64
+  
+  predicate contains_Int [@inline:trivial] (self: Fset.fset int) (e: int) = Fset.mem e self
+  
+  meta "rewrite_def" predicate contains_Int
+  
+  predicate sorted_elems_u64 (s: Fset.fset int) (seq: Seq.seq UInt64.t) =
+    Seq.length seq = Fset.cardinal s
+    /\ (forall i: int, j: int. 0 <= i /\ i < j /\ j < Seq.length seq
+        -> deep_model_u64 (Seq.get seq i) < deep_model_u64 (Seq.get seq j))
+    /\ (forall i: int. 0 <= i /\ i < Seq.length seq -> contains_Int s (deep_model_u64 (Seq.get seq i)))
+    /\ (forall x: int. contains_Int s x
+      -> (exists i: int. 0 <= i /\ i < Seq.length seq /\ deep_model_u64 (Seq.get seq i) = x))
+  
+  constant const_MAX: UInt64.t = (18446744073709551615: UInt64.t)
+  
+  function view_BTreeSet_u64_Global (self: t_BTreeSet_u64_Global) : Fset.fset int
+  
+  axiom view_BTreeSet_u64_Global_spec:
+    forall self: t_BTreeSet_u64_Global [view_BTreeSet_u64_Global self]. Fset.cardinal (view_BTreeSet_u64_Global self)
+      <= UInt64.t'int const_MAX
+  
+  function view_IntoIter_u64_Global (self: t_IntoIter_u64_Global) : Seq.seq UInt64.t
+  
+  let into_iter_BTreeSet_u64_Global (self: t_BTreeSet_u64_Global) (return (x: t_IntoIter_u64_Global)) =
+  {[@stop_split] [@expl:into_iter 'self' type invariant] inv_BTreeSet_u64_Global self}
+    any
+    [ return (result: t_IntoIter_u64_Global) ->
+    {[@stop_split] [@expl:into_iter_BTreeSet_u64_Global ensures] ([@stop_split] [@expl:into_iter result type invariant] inv_IntoIter_u64_Global result)
+      /\ ([@stop_split] [@expl:into_iter ensures] sorted_elems_u64 (view_BTreeSet_u64_Global self) (view_IntoIter_u64_Global result))}
+      (! return {result}) ]
+  
+  predicate precondition_into_iter (self: ()) (args: t_IntoIter_u64_Global) =
+    let self'0 = args in inv_IntoIter_u64_Global self'0
+  
+  meta "rewrite_def" predicate precondition_into_iter
+  
+  predicate precondition_from_iter (self: ()) (args: t_IntoIter_u64_Global) =
+    let iter = args in inv_IntoIter_u64_Global iter /\ precondition_into_iter () iter
+  
+  meta "rewrite_def" predicate precondition_from_iter
+  
+  let into_iter_IntoIter_u64_Global (self: t_IntoIter_u64_Global) (return (x: t_IntoIter_u64_Global)) =
+  {[@stop_split] [@expl:into_iter 'self' type invariant] inv_IntoIter_u64_Global self}
+    any
+    [ return (result: t_IntoIter_u64_Global) ->
+    {[@stop_split] [@expl:into_iter_IntoIter_u64_Global ensures] ([@stop_split] [@expl:into_iter result type invariant] inv_IntoIter_u64_Global result)
+      /\ ([@stop_split] [@expl:into_iter ensures] result = self)}
+      (! return {result}) ]
+  
+  predicate postcondition_into_iter (self: ()) (args: t_IntoIter_u64_Global) (result: t_IntoIter_u64_Global) =
+    let self'0 = args in inv_IntoIter_u64_Global result /\ result = self'0
+  
+  meta "rewrite_def" predicate postcondition_into_iter
+  
+  predicate produces_IntoIter_u64_Global (self: t_IntoIter_u64_Global) (visited: Seq.seq UInt64.t) (tl: t_IntoIter_u64_Global) =
+    view_IntoIter_u64_Global self = Seq.(++) visited (view_IntoIter_u64_Global tl)
+  
+  function produces_trans_IntoIter_u64_Global (a: t_IntoIter_u64_Global) (ab: Seq.seq UInt64.t) (b: t_IntoIter_u64_Global) (bc: Seq.seq UInt64.t) (c: t_IntoIter_u64_Global) : ()
+  
+  axiom produces_trans_IntoIter_u64_Global_spec:
+    forall a: t_IntoIter_u64_Global, ab: Seq.seq UInt64.t, b: t_IntoIter_u64_Global, bc: Seq.seq UInt64.t, c: t_IntoIter_u64_Global. produces_IntoIter_u64_Global a ab b
+      -> produces_IntoIter_u64_Global b bc c -> produces_IntoIter_u64_Global a (Seq.(++) ab bc) c
+  
+  function produces_refl_IntoIter_u64_Global (self: t_IntoIter_u64_Global) : ()
+  
+  axiom produces_refl_IntoIter_u64_Global_spec:
+    forall self: t_IntoIter_u64_Global. produces_IntoIter_u64_Global self (Seq.empty: Seq.seq UInt64.t) self
+  
+  predicate resolve_refmut_IntoIter_u64_Global [@inline:trivial] (_1: MutBorrow.t t_IntoIter_u64_Global) =
+    _1.final = _1.current
+  
+  meta "rewrite_def" predicate resolve_refmut_IntoIter_u64_Global
+  
+  predicate completed_IntoIter_u64_Global (self: MutBorrow.t t_IntoIter_u64_Global) =
+    resolve_refmut_IntoIter_u64_Global self /\ view_IntoIter_u64_Global self.current = (Seq.empty: Seq.seq UInt64.t)
+  
+  predicate resolve_IntoIter_u64_Global (_1: t_IntoIter_u64_Global)
+  
+  predicate contains_u64 (self: Seq.seq UInt64.t) (x: UInt64.t) =
+    exists i: int. 0 <= i /\ i < Seq.length self /\ Seq.get self i = x
+  
+  let from_iter_BTreeSet_u64_Global (iter: t_IntoIter_u64_Global) (return (x: t_BTreeSet_u64_Global)) =
+  {[@stop_split] [@expl:from_iter_BTreeSet_u64_Global requires] ([@stop_split] [@expl:from_iter 'iter' type invariant] inv_IntoIter_u64_Global iter)
+    /\ ([@stop_split] [@expl:from_iter requires] precondition_into_iter () iter)}
+    any
+    [ return (result: t_BTreeSet_u64_Global) ->
+    {[@stop_split] [@expl:from_iter_BTreeSet_u64_Global ensures] ([@stop_split] [@expl:from_iter result type invariant] inv_BTreeSet_u64_Global result)
+      /\ ([@stop_split] [@expl:from_iter ensures] exists into_iter: t_IntoIter_u64_Global, prod: Seq.seq UInt64.t, done': MutBorrow.t t_IntoIter_u64_Global. postcondition_into_iter () iter into_iter
+        /\ produces_IntoIter_u64_Global into_iter prod done'.current
+        /\ completed_IntoIter_u64_Global done'
+        /\ resolve_IntoIter_u64_Global done'.final
+        /\ (forall x: int. contains_Int (view_BTreeSet_u64_Global result) x
+          = (exists x1: UInt64.t. deep_model_u64 x1 = x /\ contains_u64 prod x1)))}
+      (! return {result}) ]
+  
+  predicate postcondition_from_iter (self: ()) (args: t_IntoIter_u64_Global) (result: t_BTreeSet_u64_Global) =
+    let iter = args in inv_BTreeSet_u64_Global result
+    /\ (exists into_iter: t_IntoIter_u64_Global, prod: Seq.seq UInt64.t, done': MutBorrow.t t_IntoIter_u64_Global. postcondition_into_iter () iter into_iter
+      /\ produces_IntoIter_u64_Global into_iter prod done'.current
+      /\ completed_IntoIter_u64_Global done'
+      /\ resolve_IntoIter_u64_Global done'.final
+      /\ (forall x: int. contains_Int (view_BTreeSet_u64_Global result) x
+        = (exists x1: UInt64.t. deep_model_u64 x1 = x /\ contains_u64 prod x1)))
+  
+  meta "rewrite_def" predicate postcondition_from_iter
+  
+  let collect_IntoIter_u64_Global (self: t_IntoIter_u64_Global) (return (x: t_BTreeSet_u64_Global)) =
+  {[@stop_split] [@expl:collect_IntoIter_u64_Global requires] ([@stop_split] [@expl:collect 'self' type invariant] inv_IntoIter_u64_Global self)
+    /\ ([@stop_split] [@expl:collect requires] precondition_from_iter () self)}
+    any
+    [ return (result: t_BTreeSet_u64_Global) ->
+    {[@stop_split] [@expl:collect_IntoIter_u64_Global ensures] ([@stop_split] [@expl:collect result type invariant] inv_BTreeSet_u64_Global result)
+      /\ ([@stop_split] [@expl:collect ensures] postcondition_from_iter () self result)}
+      (! return {result}) ]
+  
+  meta "compute_max_steps" 1000000
+  
+  meta "select_lsinst" "all"
+  
+  let roundtrip_into_iter (xs: t_BTreeSet_u64_Global) (return (x: t_BTreeSet_u64_Global)) =
+  {[@stop_split] [@expl:roundtrip_into_iter 'xs' type invariant] inv_BTreeSet_u64_Global xs}
+    (! bb0
+    [ bb0 = s0
+      [ s0 = into_iter_BTreeSet_u64_Global {xs} (fun (_x: t_IntoIter_u64_Global) -> [ &_4 <- _x ] s1)
+      | s1 = collect_IntoIter_u64_Global {_4} (fun (_x: t_BTreeSet_u64_Global) -> [ &_ret <- _x ] s2)
+      | s2 = return {_ret} ] ]
+    [ & _ret: t_BTreeSet_u64_Global = Any.any_l ()
+    | & xs: t_BTreeSet_u64_Global = xs
+    | & _4: t_IntoIter_u64_Global = Any.any_l () ])
+    [ return (result: t_BTreeSet_u64_Global) ->
+    {[@stop_split] [@expl:roundtrip_into_iter ensures] ([@stop_split] [@expl:roundtrip_into_iter result type invariant] inv_BTreeSet_u64_Global result)
+      /\ ([@stop_split] [@expl:roundtrip_into_iter ensures] view_BTreeSet_u64_Global result
+      = view_BTreeSet_u64_Global xs)}
+      (! return {result}) ]
+end
+module M_subset
+  use set.Fset
+  use creusot.int.UInt64
+  use creusot.prelude.MutBorrow
+  use creusot.int.UInt32
+  use creusot.prelude.Any
+  use int.Int
+  
+  type t_BTreeSet_u32_Global
+  
+  predicate inv_BTreeSet_u32_Global (_1: t_BTreeSet_u32_Global)
+  
+  constant const_MAX: UInt64.t = (18446744073709551615: UInt64.t)
+  
+  function view_BTreeSet_u32_Global (self: t_BTreeSet_u32_Global) : Fset.fset int
+  
+  axiom view_BTreeSet_u32_Global_spec:
+    forall self: t_BTreeSet_u32_Global [view_BTreeSet_u32_Global self]. Fset.cardinal (view_BTreeSet_u32_Global self)
+      <= UInt64.t'int const_MAX
+  
+  let new_u32 (return (x: t_BTreeSet_u32_Global)) = any
+    [ return (result: t_BTreeSet_u32_Global) ->
+    {[@stop_split] [@expl:new_u32 ensures] ([@stop_split] [@expl:new result type invariant] inv_BTreeSet_u32_Global result)
+      /\ ([@stop_split] [@expl:new ensures] view_BTreeSet_u32_Global result = (Fset.empty: Fset.fset int))}
+      (! return {result}) ]
+  
+  predicate invariant_refmut_BTreeSet_u32_Global [@inline:trivial] (self: MutBorrow.t t_BTreeSet_u32_Global) =
+    inv_BTreeSet_u32_Global self.current /\ inv_BTreeSet_u32_Global self.final
+  
+  meta "rewrite_def" predicate invariant_refmut_BTreeSet_u32_Global
+  
+  predicate inv_refmut_BTreeSet_u32_Global [@inline:trivial] (_1: MutBorrow.t t_BTreeSet_u32_Global) =
+    invariant_refmut_BTreeSet_u32_Global _1
+  
+  meta "rewrite_def" predicate inv_refmut_BTreeSet_u32_Global
+  
+  predicate contains_Int [@inline:trivial] (self: Fset.fset int) (e: int) = Fset.mem e self
+  
+  meta "rewrite_def" predicate contains_Int
+  
+  function deep_model_u32 [@inline:trivial] (self: UInt32.t) : int = UInt32.t'int self
+  
+  meta "rewrite_def" function deep_model_u32
+  
+  function add_Int [@inline:trivial] (self: Fset.fset int) (e: int) : Fset.fset int = Fset.add e self
+  
+  meta "rewrite_def" function add_Int
+  
+  let insert_u32 (self: MutBorrow.t t_BTreeSet_u32_Global) (value: UInt32.t) (return (x: bool)) =
+  {[@stop_split] [@expl:insert 'self' type invariant] inv_refmut_BTreeSet_u32_Global self}
+    any
+    [ return (result: bool) -> {[@stop_split] [@expl:insert_u32 ensures] ([@stop_split] [@expl:insert ensures #0] result
+        = (not contains_Int (view_BTreeSet_u32_Global self.current) (deep_model_u32 value)))
+      /\ ([@stop_split] [@expl:insert ensures #1] view_BTreeSet_u32_Global self.final
+      = add_Int (view_BTreeSet_u32_Global self.current) (deep_model_u32 value))}
+      (! return {result}) ]
+  
+  predicate invariant_ref_BTreeSet_u32_Global [@inline:trivial] (self: t_BTreeSet_u32_Global) =
+    inv_BTreeSet_u32_Global self
+  
+  meta "rewrite_def" predicate invariant_ref_BTreeSet_u32_Global
+  
+  predicate inv_ref_BTreeSet_u32_Global [@inline:trivial] (_1: t_BTreeSet_u32_Global) =
+    invariant_ref_BTreeSet_u32_Global _1
+  
+  meta "rewrite_def" predicate inv_ref_BTreeSet_u32_Global
+  
+  let is_subset_u32 (self: t_BTreeSet_u32_Global) (other: t_BTreeSet_u32_Global) (return (x: bool)) =
+  {[@stop_split] [@expl:is_subset_u32 requires] ([@stop_split] [@expl:is_subset 'self' type invariant] inv_ref_BTreeSet_u32_Global self)
+    /\ ([@stop_split] [@expl:is_subset 'other' type invariant] inv_ref_BTreeSet_u32_Global other)}
+    any
+    [ return (result: bool) -> {[@stop_split] [@expl:is_subset ensures] result
+      = Fset.subset (view_BTreeSet_u32_Global self) (view_BTreeSet_u32_Global other)}
+      (! return {result}) ]
+  
+  predicate is_superset_Int [@inline:trivial] (self: Fset.fset int) (other: Fset.fset int) = Fset.subset other self
+  
+  meta "rewrite_def" predicate is_superset_Int
+  
+  let is_superset_u32 (self: t_BTreeSet_u32_Global) (other: t_BTreeSet_u32_Global) (return (x: bool)) =
+  {[@stop_split] [@expl:is_superset_u32 requires] ([@stop_split] [@expl:is_superset 'self' type invariant] inv_ref_BTreeSet_u32_Global self)
+    /\ ([@stop_split] [@expl:is_superset 'other' type invariant] inv_ref_BTreeSet_u32_Global other)}
+    any
+    [ return (result: bool) -> {[@stop_split] [@expl:is_superset ensures] result
+      = is_superset_Int (view_BTreeSet_u32_Global self) (view_BTreeSet_u32_Global other)}
+      (! return {result}) ]
+  
+  predicate resolve_BTreeSet_u32_Global (_1: t_BTreeSet_u32_Global)
+  
+  let is_disjoint_u32 (self: t_BTreeSet_u32_Global) (other: t_BTreeSet_u32_Global) (return (x: bool)) =
+  {[@stop_split] [@expl:is_disjoint_u32 requires] ([@stop_split] [@expl:is_disjoint 'self' type invariant] inv_ref_BTreeSet_u32_Global self)
+    /\ ([@stop_split] [@expl:is_disjoint 'other' type invariant] inv_ref_BTreeSet_u32_Global other)}
+    any
+    [ return (result: bool) -> {[@stop_split] [@expl:is_disjoint ensures] result
+      = Fset.disjoint (view_BTreeSet_u32_Global self) (view_BTreeSet_u32_Global other)}
+      (! return {result}) ]
+  
+  meta "compute_max_steps" 1000000
+  
+  meta "select_lsinst" "all"
+  
+  let subset (return (x: ())) = (! bb0
+    [ bb0 = s0
+      [ s0 = new_u32 (fun (_x: t_BTreeSet_u32_Global) -> [ &a <- _x ] s1)
+      | s1 = new_u32 (fun (_x: t_BTreeSet_u32_Global) -> [ &b <- _x ] s2)
+      | s2 = MutBorrow.borrow_mut <t_BTreeSet_u32_Global> {a}
+          (fun (_bor: MutBorrow.t t_BTreeSet_u32_Global) ->
+            [ &_4 <- _bor ] -{inv_BTreeSet_u32_Global _bor.final}-
+            [ &a <- _bor.final ] s3) [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global a} any) ]
+      | s3 = insert_u32 {_4} {(1: UInt32.t)} (fun (_x: bool) -> [ &_3 <- _x ] s4)
+      | s4 = MutBorrow.borrow_mut <t_BTreeSet_u32_Global> {b}
+          (fun (_bor: MutBorrow.t t_BTreeSet_u32_Global) ->
+            [ &_6 <- _bor ] -{inv_BTreeSet_u32_Global _bor.final}-
+            [ &b <- _bor.final ] s5) [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global b} any) ]
+      | s5 = insert_u32 {_6} {(1: UInt32.t)} (fun (_x: bool) -> [ &_5 <- _x ] s6)
+      | s6 = MutBorrow.borrow_mut <t_BTreeSet_u32_Global> {b}
+          (fun (_bor: MutBorrow.t t_BTreeSet_u32_Global) ->
+            [ &_8 <- _bor ] -{inv_BTreeSet_u32_Global _bor.final}-
+            [ &b <- _bor.final ] s7) [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global b} any) ]
+      | s7 = insert_u32 {_8} {(2: UInt32.t)} (fun (_x: bool) -> [ &_7 <- _x ] s8)
+      | s8 = [ &_13 <- b ] s9
+      | s9 = is_subset_u32 {a} {_13} (fun (_x: bool) -> [ &_10 <- _x ] s10)
+      | s10 = any [ br0 -> {_10 = false} (! bb8) | br1 -> {_10} (! bb7) ] ]
+    | bb7 = s0
+      [ s0 = [ &_19 <- a ] s1
+      | s1 = is_superset_u32 {b} {_19} (fun (_x: bool) -> [ &_16 <- _x ] s2)
+      | s2 = any [ br0 -> {_16 = false} (! bb11) | br1 -> {_16} (! bb10) ] ]
+    | bb10 = s0
+      [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global a} any) ]
+      | s1 = -{resolve_BTreeSet_u32_Global a}- s2
+      | s2 = s3 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global b} any) ]
+      | s3 = -{resolve_BTreeSet_u32_Global b}- s4
+      | s4 = [ &_25 <- b ] s5
+      | s5 = is_disjoint_u32 {a} {_25} (fun (_x: bool) -> [ &_22 <- _x ] s6)
+      | s6 = any [ br0 -> {_22 = false} (! bb16) | br1 -> {_22} (! bb13) ] ]
+    | bb13 = {false} any
+    | bb16 = return {_ret}
+    | bb11 = s0
+      [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global b} any) ]
+      | s1 = -{resolve_BTreeSet_u32_Global b}- s2
+      | s2 = s3 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global a} any) ]
+      | s3 = -{resolve_BTreeSet_u32_Global a}- s4
+      | s4 = {false} any ]
+    | bb8 = s0
+      [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global b} any) ]
+      | s1 = -{resolve_BTreeSet_u32_Global b}- s2
+      | s2 = s3 [ _ck -> (! {[@expl:type invariant] inv_BTreeSet_u32_Global a} any) ]
+      | s3 = -{resolve_BTreeSet_u32_Global a}- s4
+      | s4 = {false} any ] ]
+    [ & _ret: () = Any.any_l ()
+    | & a: t_BTreeSet_u32_Global = Any.any_l ()
+    | & b: t_BTreeSet_u32_Global = Any.any_l ()
+    | & _3: bool = Any.any_l ()
+    | & _4: MutBorrow.t t_BTreeSet_u32_Global = Any.any_l ()
+    | & _5: bool = Any.any_l ()
+    | & _6: MutBorrow.t t_BTreeSet_u32_Global = Any.any_l ()
+    | & _7: bool = Any.any_l ()
+    | & _8: MutBorrow.t t_BTreeSet_u32_Global = Any.any_l ()
+    | & _10: bool = Any.any_l ()
+    | & _13: t_BTreeSet_u32_Global = Any.any_l ()
+    | & _16: bool = Any.any_l ()
+    | & _19: t_BTreeSet_u32_Global = Any.any_l ()
+    | & _22: bool = Any.any_l ()
+    | & _25: t_BTreeSet_u32_Global = Any.any_l () ]) [ return (result: ()) -> (! return {result}) ]
+end
+module M_to_sorted_vec
+  use seq.Seq
+  use creusot.int.UInt64
+  use set.Fset
+  use creusot.prelude.MutBorrow
+  use creusot.prelude.Any
+  use int.Int
+  
+  type t_Vec_u64_Global
+  
+  constant const_MAX: UInt64.t = (18446744073709551615: UInt64.t)
+  
+  function view_Vec_u64_Global (self: t_Vec_u64_Global) : Seq.seq UInt64.t
+  
+  axiom view_Vec_u64_Global_spec:
+    forall self: t_Vec_u64_Global [view_Vec_u64_Global self]. Seq.length (view_Vec_u64_Global self)
+      <= UInt64.t'int const_MAX
+  
+  let new_u64 (return (x: t_Vec_u64_Global)) = any
+    [ return (result: t_Vec_u64_Global) -> {[@stop_split] [@expl:new ensures] Seq.length (view_Vec_u64_Global result)
+      = 0}
+      (! return {result}) ]
+  
+  type t_BTreeSet_u64_Global
+  
+  type t_Iter_u64
+  
+  predicate inv_BTreeSet_u64_Global (_1: t_BTreeSet_u64_Global)
+  
+  predicate invariant_ref_BTreeSet_u64_Global [@inline:trivial] (self: t_BTreeSet_u64_Global) =
+    inv_BTreeSet_u64_Global self
+  
+  meta "rewrite_def" predicate invariant_ref_BTreeSet_u64_Global
+  
+  predicate inv_ref_BTreeSet_u64_Global [@inline:trivial] (_1: t_BTreeSet_u64_Global) =
+    invariant_ref_BTreeSet_u64_Global _1
+  
+  meta "rewrite_def" predicate inv_ref_BTreeSet_u64_Global
+  
+  predicate inv_Iter_u64 (_1: t_Iter_u64)
+  
+  function deep_model_u64 [@inline:trivial] (self: UInt64.t) : int = UInt64.t'int self
+  
+  meta "rewrite_def" function deep_model_u64
+  
+  function deep_model_ref_u64 [@inline:trivial] (self: UInt64.t) : int = deep_model_u64 self
+  
+  meta "rewrite_def" function deep_model_ref_u64
+  
+  predicate contains_Int [@inline:trivial] (self: Fset.fset int) (e: int) = Fset.mem e self
+  
+  meta "rewrite_def" predicate contains_Int
+  
+  predicate sorted_elems_ref_u64 (s: Fset.fset int) (seq: Seq.seq UInt64.t) =
+    Seq.length seq = Fset.cardinal s
+    /\ (forall i: int, j: int. 0 <= i /\ i < j /\ j < Seq.length seq
+        -> deep_model_ref_u64 (Seq.get seq i) < deep_model_ref_u64 (Seq.get seq j))
+    /\ (forall i: int. 0 <= i /\ i < Seq.length seq -> contains_Int s (deep_model_ref_u64 (Seq.get seq i)))
+    /\ (forall x: int. contains_Int s x
+      -> (exists i: int. 0 <= i /\ i < Seq.length seq /\ deep_model_ref_u64 (Seq.get seq i) = x))
+  
+  function view_BTreeSet_u64_Global (self: t_BTreeSet_u64_Global) : Fset.fset int
+  
+  axiom view_BTreeSet_u64_Global_spec:
+    forall self: t_BTreeSet_u64_Global [view_BTreeSet_u64_Global self]. Fset.cardinal (view_BTreeSet_u64_Global self)
+      <= UInt64.t'int const_MAX
+  
+  function view_Iter_u64 (self: t_Iter_u64) : Seq.seq UInt64.t
+  
+  let iter_u64 (self: t_BTreeSet_u64_Global) (return (x: t_Iter_u64)) =
+  {[@stop_split] [@expl:iter 'self' type invariant] inv_ref_BTreeSet_u64_Global self}
+    any
+    [ return (result: t_Iter_u64) ->
+    {[@stop_split] [@expl:iter_u64 ensures] ([@stop_split] [@expl:iter result type invariant] inv_Iter_u64 result)
+      /\ ([@stop_split] [@expl:iter ensures] sorted_elems_ref_u64 (view_BTreeSet_u64_Global self) (view_Iter_u64 result))}
+      (! return {result}) ]
+  
+  let into_iter_Iter_u64 (self: t_Iter_u64) (return (x: t_Iter_u64)) =
+  {[@stop_split] [@expl:into_iter 'self' type invariant] inv_Iter_u64 self}
+    any
+    [ return (result: t_Iter_u64) ->
+    {[@stop_split] [@expl:into_iter_Iter_u64 ensures] ([@stop_split] [@expl:into_iter result type invariant] inv_Iter_u64 result)
+      /\ ([@stop_split] [@expl:into_iter ensures] result = self)}
+      (! return {result}) ]
+  
+  type t_Option_ref_u64 = None | Some UInt64.t
+  
+  predicate invariant_refmut_Iter_u64 [@inline:trivial] (self: MutBorrow.t t_Iter_u64) =
+    inv_Iter_u64 self.current /\ inv_Iter_u64 self.final
+  
+  meta "rewrite_def" predicate invariant_refmut_Iter_u64
+  
+  predicate inv_refmut_Iter_u64 [@inline:trivial] (_1: MutBorrow.t t_Iter_u64) = invariant_refmut_Iter_u64 _1
+  
+  meta "rewrite_def" predicate inv_refmut_Iter_u64
+  
+  predicate produces_Iter_u64 (self: t_Iter_u64) (visited: Seq.seq UInt64.t) (tl: t_Iter_u64) =
+    view_Iter_u64 self = Seq.(++) visited (view_Iter_u64 tl)
+  
+  function produces_trans_Iter_u64 (a: t_Iter_u64) (ab: Seq.seq UInt64.t) (b: t_Iter_u64) (bc: Seq.seq UInt64.t) (c: t_Iter_u64) : ()
+  
+  axiom produces_trans_Iter_u64_spec:
+    forall a: t_Iter_u64, ab: Seq.seq UInt64.t, b: t_Iter_u64, bc: Seq.seq UInt64.t, c: t_Iter_u64. produces_Iter_u64 a ab b
+      -> produces_Iter_u64 b bc c -> produces_Iter_u64 a (Seq.(++) ab bc) c
+  
+  function produces_refl_Iter_u64 (self: t_Iter_u64) : ()
+  
+  axiom produces_refl_Iter_u64_spec: forall self: t_Iter_u64. produces_Iter_u64 self (Seq.empty: Seq.seq UInt64.t) self
+  
+  predicate resolve_refmut_Iter_u64 [@inline:trivial] (_1: MutBorrow.t t_Iter_u64) = _1.final = _1.current
+  
+  meta "rewrite_def" predicate resolve_refmut_Iter_u64
+  
+  predicate completed_Iter_u64 (self: MutBorrow.t t_Iter_u64) =
+    resolve_refmut_Iter_u64 self /\ view_Iter_u64 self.current = (Seq.empty: Seq.seq UInt64.t)
+  
+  let next_Iter_u64 (self: MutBorrow.t t_Iter_u64) (return (x: t_Option_ref_u64)) =
+  {[@stop_split] [@expl:next 'self' type invariant] inv_refmut_Iter_u64 self}
+    any
+    [ return (result: t_Option_ref_u64) -> {[@stop_split] [@expl:next ensures] match result with
+        | None -> completed_Iter_u64 self
+        | Some v -> produces_Iter_u64 self.current (Seq.singleton v) self.final
+        end}
+      (! return {result}) ]
+  
+  function index_Vec_u64_Global [@inline:trivial] (self: t_Vec_u64_Global) (ix: int) : UInt64.t =
+    Seq.get (view_Vec_u64_Global self) ix
+  
+  meta "rewrite_def" function index_Vec_u64_Global
+  
+  predicate inv_Seq_ref_u64 [@inline:trivial] (_1: Seq.seq UInt64.t) = true
+  
+  meta "rewrite_def" predicate inv_Seq_ref_u64
+  
+  let elim_Some (_x: t_Option_ref_u64) (return (f0: UInt64.t)) = any
+    [ _k (f0: UInt64.t) -> {Some f0 = _x} (! return {f0})
+    | _chk -> (! {[@expl:elim Some] match _x with
+        | Some _ -> true
+        | _ -> false
+        end}
+      any) ]
+  
+  let push_u64 (self: MutBorrow.t t_Vec_u64_Global) (value: UInt64.t) (return (x: ())) = any
+    [ return (result: ()) -> {[@stop_split] [@expl:push ensures] view_Vec_u64_Global self.final
+      = Seq.snoc (view_Vec_u64_Global self.current) value}
+      (! return {result}) ]
+  
+  predicate resolve_Iter_u64 (_1: t_Iter_u64)
+  
+  meta "compute_max_steps" 1000000
+  
+  meta "select_lsinst" "all"
+  
+  let to_sorted_vec (s: t_BTreeSet_u64_Global) (return (x: t_Vec_u64_Global)) =
+  {[@stop_split] [@expl:to_sorted_vec 's' type invariant] inv_ref_BTreeSet_u64_Global s}
+    (! bb0
+    [ bb0 = s0
+      [ s0 = new_u64 (fun (_x: t_Vec_u64_Global) -> [ &res <- _x ] s1)
+      | s1 = iter_u64 {s} (fun (_x: t_Iter_u64) -> [ &it <- _x ] s2)
+      | s2 = [ &it0 <- it ] s3
+      | s3 = into_iter_Iter_u64 {it} (fun (_x: t_Iter_u64) -> [ &iter <- _x ] s4)
+      | s4 = [ &iter_old <- iter ] s5
+      | s5 = [ &_19 <- Seq.empty: Seq.seq UInt64.t ] s6
+      | s6 = [ &produced <- _19 ] s7
+      | s7 = bb7 ]
+    | bb7 = bb7
+      [ bb7 = {[@expl:inferred invariant: type invariant] inv_Iter_u64 iter}
+        {[@expl:for invariant] inv_Seq_ref_u64 produced}
+        {[@expl:for invariant] produces_Iter_u64 iter_old produced iter}
+        {[@expl:loop invariant #0] forall i: int. 0 <= i /\ i < Seq.length produced
+          -> Seq.get produced i = Seq.get (view_Iter_u64 it0) i}
+        {[@expl:loop invariant #1] Seq.length (view_Vec_u64_Global res) = Seq.length produced}
+        {[@expl:loop invariant #2] forall i: int. 0 <= i /\ i < Seq.length produced
+          -> index_Vec_u64_Global res i = Seq.get produced i}
+        (! s0)
+        [ s0 = MutBorrow.borrow_mut <t_Iter_u64> {iter}
+            (fun (_bor: MutBorrow.t t_Iter_u64) ->
+              [ &_40 <- _bor ] -{inv_Iter_u64 _bor.final}-
+              [ &iter <- _bor.final ] s1) [ _ck -> (! {[@expl:type invariant] inv_Iter_u64 iter} any) ]
+        | s1 = MutBorrow.borrow_final <t_Iter_u64> {_40.current} {MutBorrow.get_id _40}
+            (fun (_bor: MutBorrow.t t_Iter_u64) ->
+              [ &_39 <- _bor ] -{inv_Iter_u64 _bor.final}-
+              [ &_40 <- { _40 with current = _bor.final } ] s2)
+          [ _ck -> (! {[@expl:type invariant] inv_Iter_u64 _40.current} any) ]
+        | s2 = next_Iter_u64 {_39} (fun (_x: t_Option_ref_u64) -> [ &_38 <- _x ] s3)
+        | s3 = s4 [ _ck -> (! {[@expl:type invariant] inv_refmut_Iter_u64 _40} any) ]
+        | s4 = -{resolve_refmut_Iter_u64 _40}- s5
+        | s5 = any [ br0 -> {_38 = None} (! bb12) | br1 (x0: UInt64.t) -> {_38 = Some x0} (! bb13) ] ]
+        [ bb13 = s0
+          [ s0 = elim_Some {_38} (fun (r0: UInt64.t) -> [ &__creusot_proc_iter_elem <- r0 ] s1)
+          | s1 = [ &_44 <- Seq.(++) produced (Seq.singleton __creusot_proc_iter_elem) ] s2
+          | s2 = [ &produced <- _44 ] s3
+          | s3 = [ &x <- __creusot_proc_iter_elem ] s4
+          | s4 = MutBorrow.borrow_mut <t_Vec_u64_Global> {res}
+              (fun (_bor: MutBorrow.t t_Vec_u64_Global) -> [ &_50 <- _bor ] [ &res <- _bor.final ] s5)
+          | s5 = push_u64 {_50} {x} (fun (_x: ()) -> [ &_49 <- _x ] s6)
+          | s6 = bb7 ] ] ]
+    | bb12 = s0
+      [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_Iter_u64 iter} any) ]
+      | s1 = -{resolve_Iter_u64 iter}- s2
+      | s2 = [ &_ret <- res ] s3
+      | s3 = return {_ret} ] ]
+    [ & _ret: t_Vec_u64_Global = Any.any_l ()
+    | & s: t_BTreeSet_u64_Global = s
+    | & res: t_Vec_u64_Global = Any.any_l ()
+    | & it: t_Iter_u64 = Any.any_l ()
+    | & it0: t_Iter_u64 = Any.any_l ()
+    | & iter: t_Iter_u64 = Any.any_l ()
+    | & iter_old: t_Iter_u64 = Any.any_l ()
+    | & produced: Seq.seq UInt64.t = Any.any_l ()
+    | & _19: Seq.seq UInt64.t = Any.any_l ()
+    | & _38: t_Option_ref_u64 = Any.any_l ()
+    | & _39: MutBorrow.t t_Iter_u64 = Any.any_l ()
+    | & _40: MutBorrow.t t_Iter_u64 = Any.any_l ()
+    | & __creusot_proc_iter_elem: UInt64.t = Any.any_l ()
+    | & _44: Seq.seq UInt64.t = Any.any_l ()
+    | & x: UInt64.t = Any.any_l ()
+    | & _49: () = Any.any_l ()
+    | & _50: MutBorrow.t t_Vec_u64_Global = Any.any_l () ])
+    [ return (result: t_Vec_u64_Global) ->
+    {[@stop_split] [@expl:to_sorted_vec ensures] ([@stop_split] [@expl:to_sorted_vec ensures #0] forall i: int. 0 <= i
+            /\ i < Seq.length (view_Vec_u64_Global result)
+          -> contains_Int (view_BTreeSet_u64_Global s) (UInt64.t'int (index_Vec_u64_Global result i)))
+      /\ ([@stop_split] [@expl:to_sorted_vec ensures #1] forall i: int, j: int. 0 <= i
+          /\ i < j /\ j < Seq.length (view_Vec_u64_Global result)
+        -> UInt64.t'int (index_Vec_u64_Global result i) < UInt64.t'int (index_Vec_u64_Global result j))}
+      (! return {result}) ]
+end

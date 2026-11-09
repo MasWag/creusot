@@ -1,0 +1,19 @@
+(* <std::collections::btree_set::Union<'a, T> as std::iter::IteratorSpec> *)
+
+use seq.Seq
+
+type t_Union_T
+
+type t_T
+
+function view_Union_T (self: t_Union_T) : Seq.seq t_T
+
+predicate produces_Union_T (self: t_Union_T) (visited: Seq.seq t_T) (tl: t_Union_T) =
+  view_Union_T self = Seq.(++) visited (view_Union_T tl)
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+goal refines: forall self: t_Union_T. forall result: (). produces_Union_T self (Seq.empty: Seq.seq t_T) self
+      -> produces_Union_T self (Seq.empty: Seq.seq t_T) self
